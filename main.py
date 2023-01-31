@@ -1,4 +1,4 @@
-from gui import viewBoard
+from gui import viewBoard, fenToGrid
 from moves import getAllLegalMoves
 from fen import generateFen
 
