@@ -1,22 +1,33 @@
-def generateFen(previousFen, newGrid):
-	_, color, castling, _, halfmove, fullmove = previousFen.split()
+def updateFen(previousFen, move):
+	position, color, castling, passant, halfmove, fullmove = previousFen.split()
+	grid = fenToGrid(position)
 
+	capture = False if grid[move[1][0]][move[1][1]] == " " else True
+
+	letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
+	numbers = ["8", "7", "6", "5", "4", "3", "2", "1"]
 	newFen = ""
 
 	# position
-	for row in newGrid:
-		emptyCount = 0
-		for char in row:
-			if char == " ":
-				emptyCount += 1
-				continue
-			if emptyCount > 0:
-				newFen += str(emptyCount)
-				emptyCount = 0
-			newFen += char
-		if emptyCount > 0:
-			newFen += str(emptyCount)
-		newFen += "/"
+	piece = grid[move[0][0]][move[0][1]]
+	grid[move[0][0]][move[0][1]] = " "
+	grid[move[1][0]][move[1][1]] = piece
+
+	# passant
+	if piece.lower() == "p" and passant != "-":
+		if numbers[move[1][0]] == passant[1] and letters[move[1][1]] == passant[0]:
+			grid[move[0][0]][move[1][1]] = " "
+	
+	# castling
+	if piece.lower() == "k" and abs(move[0][1] - move[1][1]) == 2:
+		if move[1][1] == 7:
+			grid[move[1][0]][5] = grid[move[1][0]][7]
+			grid[move[1][0]][7] = " "
+		else:
+			grid[move[1][0]][3] = grid[move[1][0]][0]
+			grid[move[1][0]][0] = " "
+	newGrid = grid
+	newFen += gridToFen(grid)
 
 	# color
 	newFen += " w " if color == "b" else " b "
@@ -46,10 +57,57 @@ def generateFen(previousFen, newGrid):
 
 	newFen += castling
 
-	# TODO : Detect en passant
-	newFen += " - "
+	# en passant
+	rowNumber = 3 if color == "b" else 4
+	direction = 1 if color == "b" else -1
+	foundPassant = False
+	for char in range(1, len(newGrid[rowNumber])-1):
+		if newGrid[rowNumber][char] == ("P" if color == "b" else "p") and newGrid[rowNumber - direction][char] == newGrid[rowNumber - direction * 2][char] == " ":
+			if newGrid[rowNumber][char - 1] == ("p" if color == "b" else "P") or newGrid[rowNumber][char + 1] == ("p" if color == "b" else "P"):
+				row = position.split("/")[rowNumber - 2 * direction]
+				if row[char].lower() == "p":
+					newFen += " " + letters[char] + str(rowNumber - direction) + " "
+					foundPassant = True
+					break
+	if not foundPassant:
+		newFen += " - "
 
-	newFen += str(int(halfmove) + 1) + " "
+	if capture or piece.lower() == "p" or foundPassant:
+		newFen += "0 "
+	else:
+		newFen += str(int(halfmove) + 1) + " "
 	newFen += fullmove if color == "w" else str(int(fullmove) + 1)
 
 	return newFen
+
+
+def fenToGrid(position):
+	grid = []
+	rows = position.split("/")
+
+	for row in rows:
+		for char in row:
+			if char.isdigit():
+				row = row.replace(char, int(char) * " ")
+		grid.append(list(row))
+
+	return grid
+
+def gridToFen(grid):
+	fen = ""
+
+	for row in grid:
+		emptyCount = 0
+		for char in row:
+			if char == " ":
+				emptyCount += 1
+				continue
+			if emptyCount > 0:
+				fen += str(emptyCount)
+				emptyCount = 0
+			fen += char
+		if emptyCount > 0:
+			fen += str(emptyCount)
+		fen += "/"
+
+	return fen[:-1]

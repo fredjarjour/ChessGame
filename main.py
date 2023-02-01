@@ -1,5 +1,7 @@
-from gui import viewBoard, fenToGrid
+from gui import viewBoard
 from moves import getAllLegalMoves
-from fen import generateFen
+from fen import updateFen, fenToGrid, gridToFen
 
-print(viewBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"))
+print(updateFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", ((6,4), (4,4))))
+
+

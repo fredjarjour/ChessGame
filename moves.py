@@ -1,4 +1,4 @@
-from gui import fenToGrid
+from fen import fenToGrid
 from pieces import movements
 
 def getAllLegalMoves(fen):
@@ -79,6 +79,7 @@ def getLegalMoves(grid, position, castling, passant):
 				
 
 	# king
+	# TODO: check for checks
 	if piece.lower() == "k":
 		for move in movements["k"]:
 			if not (0 <= position[0] + move[0] <= 7 and 0 <= position[1] + move[1] <= 7):
