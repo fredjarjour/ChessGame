@@ -1,4 +1,4 @@
-def updateFen(previousFen, move):
+def updateFen(previousFen, move, promote = None):
 	position, color, castling, passant, halfmove, fullmove = previousFen.split()
 	grid = fenToGrid(position)
 
@@ -11,6 +11,14 @@ def updateFen(previousFen, move):
 	# position
 	piece = grid[move[0][0]][move[0][1]]
 	grid[move[0][0]][move[0][1]] = " "
+	
+	# promotion
+	if piece.lower() == "p" and move[1][0] in [0, 7]:
+		if promote in ["q", "r", "b", "n", "Q", "R", "B", "N"]:
+			piece = promote.upper() if piece.isupper() else promote.lower()
+		else:
+			return False
+
 	grid[move[1][0]][move[1][1]] = piece
 
 	# passant
