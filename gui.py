@@ -1,3 +1,5 @@
+from fen import fenToGrid
+
 def viewBoard(fen):
 	grid = fenToGrid(fen.split()[0])
 	board = "┌" + "-" * 31 + "┐\n"
@@ -11,16 +13,3 @@ def viewBoard(fen):
 	board[-34] = "└"
 	board = "".join(board)
 	return board[:-2] + "┘"
-
-
-def fenToGrid(position):
-	grid = []
-	rows = position.split("/")
-
-	for row in rows:
-		for char in row:
-			if char.isdigit():
-				row = row.replace(char, int(char) * " ")
-		grid.append(list(row))
-
-	return grid
