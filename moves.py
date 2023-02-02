@@ -1,5 +1,6 @@
 from fen import fenToGrid, updateGrid
 from pieces import movements
+from gui import viewBoard
 
 def getAllLegalMoves(fen):
 	pseudoLegalMoves = []
@@ -48,7 +49,7 @@ def getLegalMoves(grid, position, castling, passant):
 		if position[1] < 7 and (grid[position[0] + direction][position[1] + 1].isupper() == (color == "b")) and (grid[position[0] + direction][position[1] + 1] != " "):
 			legalMoves.append((position, (position[0] + direction, position[1] + 1)))
 		# en passant
-		if passant != "-":
+		if len(passant) > 1:
 			letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
 			if position[1] > 0 and position[0] + direction == int(passant[1]) and position[1] - 1 == letters.index(passant[0]):
 				legalMoves.append((position, (position[0] + direction, position[1] - 1)))
@@ -108,24 +109,43 @@ def getLegalMoves(grid, position, castling, passant):
 
 
 def checkForCheck(grid, move, color):
+	castling = grid[move[0][0]][move[0][1]].lower() == "k" and abs(move[0][1] - move[1][1]) == 2
+	
+	if castling:
+		if isCheck(grid, color):
+			return True
+		middleMove = (move[0], (move[1][0], abs(move[0][1] + move[1][1]) // 2))
+		newGrid = updateGrid([row[:] for row in grid], middleMove)
+		if isCheck(newGrid, color):
+			return True
+			
+			
+
 	newGrid = updateGrid([row[:] for row in grid], move)
+	
+
+
+	return isCheck(newGrid, color)
+	
+	
+def isCheck(grid, color):
 	king = None
 	# find king
 	for row in range(8):
 		for char in range(8):
-			if newGrid[row][char] == ("K" if color == "w" else "k"):
+			if grid[row][char] == ("K" if color == "w" else "k"):
 				king = (row, char)
 				break
 		if king != None:
 			break
-	
+
 	# queen and rook
 	for moveList in movements["q"]:
 		for move in moveList:
 			# stop if reached end of board
 			if not (0 <= king[0] + move[0] <= 7 and 0 <= king[1] + move[1] <= 7):
 				break
-			target = newGrid[king[0] + move[0]][king[1] + move[1]]
+			target = grid[king[0] + move[0]][king[1] + move[1]]
 			
 			if target == " ":
 				continue
@@ -133,7 +153,7 @@ def checkForCheck(grid, move, color):
 			if (target.isupper() == (color == "b")):
 				if abs(move[0]) == abs(move[1]) and target.lower() in ["q", "b"]:
 					return True
-				if target.lower() in ["q", "r"]:
+				if (move[0] == 0 or move[1] == 0) and target.lower() in ["q", "r"]:
 					return True
 				break
 			break
@@ -142,27 +162,25 @@ def checkForCheck(grid, move, color):
 	for move in movements["n"]:
 		if not (0 <= king[0] + move[0] <= 7 and 0 <= king[1] + move[1] <= 7):
 			continue
-		if newGrid[king[0] + move[0]][king[1] + move[1]] == ("n" if color == "w" else "N"):
+		if grid[king[0] + move[0]][king[1] + move[1]] == ("n" if color == "w" else "N"):
 			return True
 
 	# king
 	for move in movements["k"]:
 		if not (0 <= king[0] + move[0] <= 7 and 0 <= king[1] + move[1] <= 7):
 			continue
-		if newGrid[king[0] + move[0]][king[1] + move[1]] == ("k" if color == "w" else "K"):
+		if grid[king[0] + move[0]][king[1] + move[1]] == ("k" if color == "w" else "K"):
 			return True
 
 	# pawn
 	direction = -1 if color == "w" else 1
 	if not (0 <= king[0] + direction <= 7):
 		return False
-	if 0 <= king[1] - 1 <= 7 and newGrid[king[0] + direction][king[1] - 1] == ("p" if color == "w" else "P"):
+	if 0 <= king[1] - 1 <= 7 and grid[king[0] + direction][king[1] - 1] == ("p" if color == "w" else "P"):
 		return True
-	if 0 <= king[1] + 1 <= 7 and newGrid[king[0] + direction][king[1] + 1] == ("p" if color == "w" else "P"):
+	if 0 <= king[1] + 1 <= 7 and grid[king[0] + direction][king[1] + 1] == ("p" if color == "w" else "P"):
 		return True
 
 	return False
-	
-
 
 	
