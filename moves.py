@@ -1,8 +1,8 @@
-from fen import fenToGrid
+from fen import fenToGrid, updateGrid
 from pieces import movements
 
 def getAllLegalMoves(fen):
-	legalMoves = []
+	pseudoLegalMoves = []
 
 	fenWords = fen.split()
 	grid = fenToGrid(fenWords[0])
@@ -16,8 +16,14 @@ def getAllLegalMoves(fen):
 				continue
 			if grid[row][char].isupper() == (color == "w"):
 				test = getLegalMoves(grid, (row, char), castling, passant)
-				legalMoves += test
+				pseudoLegalMoves += test
 
+	# remove checks
+	legalMoves = []
+	for move in pseudoLegalMoves:
+		if not checkForCheck(grid, move, color):
+			legalMoves.append(move)
+	
 	return legalMoves
 
 
@@ -99,3 +105,64 @@ def getLegalMoves(grid, position, castling, passant):
 						legalMoves.append((position, (row, 6)))
 
 	return legalMoves
+
+
+def checkForCheck(grid, move, color):
+	newGrid = updateGrid([row[:] for row in grid], move)
+	king = None
+	# find king
+	for row in range(8):
+		for char in range(8):
+			if newGrid[row][char] == ("K" if color == "w" else "k"):
+				king = (row, char)
+				break
+		if king != None:
+			break
+	
+	# queen and rook
+	for moveList in movements["q"]:
+		for move in moveList:
+			# stop if reached end of board
+			if not (0 <= king[0] + move[0] <= 7 and 0 <= king[1] + move[1] <= 7):
+				break
+			target = newGrid[king[0] + move[0]][king[1] + move[1]]
+			
+			if target == " ":
+				continue
+			# stop in that direction if you can capture
+			if (target.isupper() == (color == "b")):
+				if abs(move[0]) == abs(move[1]) and target.lower() in ["q", "b"]:
+					return True
+				if target.lower() in ["q", "r"]:
+					return True
+				break
+			break
+	
+	# knight
+	for move in movements["n"]:
+		if not (0 <= king[0] + move[0] <= 7 and 0 <= king[1] + move[1] <= 7):
+			continue
+		if newGrid[king[0] + move[0]][king[1] + move[1]] == ("n" if color == "w" else "N"):
+			return True
+
+	# king
+	for move in movements["k"]:
+		if not (0 <= king[0] + move[0] <= 7 and 0 <= king[1] + move[1] <= 7):
+			continue
+		if newGrid[king[0] + move[0]][king[1] + move[1]] == ("k" if color == "w" else "K"):
+			return True
+
+	# pawn
+	direction = -1 if color == "w" else 1
+	if not (0 <= king[0] + direction <= 7):
+		return False
+	if 0 <= king[1] - 1 <= 7 and newGrid[king[0] + direction][king[1] - 1] == ("p" if color == "w" else "P"):
+		return True
+	if 0 <= king[1] + 1 <= 7 and newGrid[king[0] + direction][king[1] + 1] == ("p" if color == "w" else "P"):
+		return True
+
+	return False
+	
+
+
+	

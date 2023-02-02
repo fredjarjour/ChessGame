@@ -5,37 +5,11 @@ def updateFen(previousFen, move, promote = None):
 	capture = False if grid[move[1][0]][move[1][1]] == " " else True
 
 	letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
-	numbers = ["8", "7", "6", "5", "4", "3", "2", "1"]
+	
 	newFen = ""
-
-	# position
-	piece = grid[move[0][0]][move[0][1]]
-	grid[move[0][0]][move[0][1]] = " "
 	
-	# promotion
-	if piece.lower() == "p" and move[1][0] in [0, 7]:
-		if promote in ["q", "r", "b", "n", "Q", "R", "B", "N"]:
-			piece = promote.upper() if piece.isupper() else promote.lower()
-		else:
-			return False
-
-	grid[move[1][0]][move[1][1]] = piece
-
-	# passant
-	if piece.lower() == "p" and passant != "-":
-		if numbers[move[1][0]] == passant[1] and letters[move[1][1]] == passant[0]:
-			grid[move[0][0]][move[1][1]] = " "
-	
-	# castling
-	if piece.lower() == "k" and abs(move[0][1] - move[1][1]) == 2:
-		if move[1][1] == 7:
-			grid[move[1][0]][5] = grid[move[1][0]][7]
-			grid[move[1][0]][7] = " "
-		else:
-			grid[move[1][0]][3] = grid[move[1][0]][0]
-			grid[move[1][0]][0] = " "
-	newGrid = grid
-	newFen += gridToFen(grid)
+	newGrid = updateGrid(grid, move, passant, promote)
+	newFen += gridToFen(newGrid)
 
 	# color
 	newFen += " w " if color == "b" else " b "
@@ -80,13 +54,44 @@ def updateFen(previousFen, move, promote = None):
 	if not foundPassant:
 		newFen += " - "
 
-	if capture or piece.lower() == "p" or foundPassant:
+	if capture or grid[move[0][0]][move[0][1]].lower() == "p" or foundPassant:
 		newFen += "0 "
 	else:
 		newFen += str(int(halfmove) + 1) + " "
 	newFen += fullmove if color == "w" else str(int(fullmove) + 1)
 
 	return newFen
+
+def updateGrid(grid, move, passant="-", promote=None):
+	numbers = ["8", "7", "6", "5", "4", "3", "2", "1"]
+	letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
+	# position
+	piece = grid[move[0][0]][move[0][1]]
+	grid[move[0][0]][move[0][1]] = " "
+	
+	# promotion
+	if piece.lower() == "p" and move[1][0] in [0, 7]:
+		if promote in ["q", "r", "b", "n", "Q", "R", "B", "N"]:
+			piece = promote.upper() if piece.isupper() else promote.lower()
+		else:
+			return False
+
+	grid[move[1][0]][move[1][1]] = piece
+
+	# passant
+	if piece.lower() == "p" and passant != "-":
+		if numbers[move[1][0]] == passant[1] and letters[move[1][1]] == passant[0]:
+			grid[move[0][0]][move[1][1]] = " "
+	
+	# castling
+	if piece.lower() == "k" and abs(move[0][1] - move[1][1]) == 2:
+		if move[1][1] == 7:
+			grid[move[1][0]][5] = grid[move[1][0]][7]
+			grid[move[1][0]][7] = " "
+		else:
+			grid[move[1][0]][3] = grid[move[1][0]][0]
+			grid[move[1][0]][0] = " "
+	return grid
 
 
 def fenToGrid(position):
