@@ -1,6 +1,5 @@
-from gui import viewBoard
 from moves import getAllLegalMoves
-from fen import updateFen, fenToGrid, gridToFen
+from fen import updateFen
 from result import gameOver
 import threefold
 import random
@@ -17,7 +16,7 @@ for _ in range(numGames):
         fen = updateFen(fen, move)
         game = gameOver(fen) 
         if game[0]:
-            results[game[1]] = results.get(game[1], 0) + 1
+            results[game[2]] = results.get(game[2], 0) + 1
             break
     threefold.positions = {}
 
