@@ -1,6 +1,11 @@
-from moves import isCheck, getAllLegalMoves
-from fen import fenToGrid
-import threefold
+try:
+    from moves import isCheck, getAllLegalMoves
+    from fen import fenToGrid
+    import threefold
+except ImportError:
+    from Chess.moves import isCheck, getAllLegalMoves
+    from Chess.fen import fenToGrid
+    import Chess.threefold as threefold
 
 # return a tuple: (isGameOver: bool, result: string explaining)
 def gameOver(fen):

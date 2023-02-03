@@ -1,4 +1,7 @@
-from fen import fenToGrid
+try:
+	from fen import fenToGrid
+except ImportError:
+	from Chess.fen import fenToGrid
 
 def viewBoard(fen):
 	grid = fenToGrid(fen.split()[0])

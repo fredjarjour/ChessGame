@@ -1,6 +1,9 @@
-from fen import fenToGrid, updateGrid
-from pieces import movements
-from gui import viewBoard
+try:
+	from fen import fenToGrid, updateGrid
+	from pieces import movements
+except ImportError:
+	from Chess.fen import fenToGrid, updateGrid
+	from Chess.pieces import movements
 
 def getAllLegalMoves(fen):
 	pseudoLegalMoves = []
