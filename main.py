@@ -1,22 +1,25 @@
 from gui import viewBoard
 from moves import getAllLegalMoves
 from fen import updateFen, fenToGrid, gridToFen
+from result import gameOver
+import threefold
 import random
 
-m = 1000
 
-for games in range(1000):
+results = {}
+numGames = 10
+
+for _ in range(numGames):
     fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-    legalMoves = getAllLegalMoves(fen)
-    i = 0
-    while len(legalMoves) > 0 and i < 500:
-        i += 1
+    while True:
+        legalMoves = getAllLegalMoves(fen)
         move = random.choice(legalMoves)
         fen = updateFen(fen, move)
-        legalMoves = getAllLegalMoves(fen)
+        game = gameOver(fen) 
+        if game[0]:
+            results[game[1]] = results.get(game[1], 0) + 1
+            break
+    threefold.positions = {}
 
-    if len(legalMoves) == 0:
-        if int(fen.split()[-1]) < m:
-            m = int(fen.split()[-1])
-            print(fen)
-
+print(f"After running {numGames} games, the results are:")
+print(results)
