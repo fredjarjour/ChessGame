@@ -19,7 +19,7 @@ def gameOver(fen):
     # checkmate or stalemate
     if getAllLegalMoves(fen) == []:
         if isCheck(fenToGrid(fen.split()[0]), fen.split()[1]):
-            return [True, math.inf * 1 if fen.split()[1] == "w" else -1, "Checkmate"]
+            return [True, math.inf * (-1 if fen.split()[1] == "w" else 1), "Checkmate"]
         return [True, 0, "Stalemate"]
     
     return [False, None, None]
