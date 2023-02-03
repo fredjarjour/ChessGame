@@ -3,8 +3,8 @@ try:
 except ImportError:
 	from Chess.fen import fenToGrid
 
-def viewBoard(fen):
-	grid = fenToGrid(fen.split()[0])
+def viewBoard(position):
+	grid = fenToGrid(position)
 	board = "|" + "-" * 31 + "|\n"
 
 	for row in grid:
