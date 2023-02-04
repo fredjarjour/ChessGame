@@ -53,10 +53,12 @@ def getLegalMoves(grid, position, castling, passant):
 			legalMoves.append((position, (position[0] + direction, position[1] + 1)))
 		# en passant
 		if len(passant) > 1:
+			print(passant, position)
 			letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
-			if position[1] > 0 and position[0] + direction == int(passant[1]) and position[1] - 1 == letters.index(passant[0]):
+			numbers = ["8", "7", "6", "5", "4", "3", "2", "1"]
+			if position[1] > 0 and numbers[position[0] + direction] == passant[1] and position[1] - 1 == letters.index(passant[0]):
 				legalMoves.append((position, (position[0] + direction, position[1] - 1)))
-			if position[1] < 7 and position[0] + direction == int(passant[1]) and position[1] + 1 == letters.index(passant[0]):
+			if position[1] < 7 and numbers[position[0] + direction] == passant[1] and position[1] + 1 == letters.index(passant[0]):
 				legalMoves.append((position, (position[0] + direction, position[1] + 1)))
 
 	# knight
@@ -89,7 +91,6 @@ def getLegalMoves(grid, position, castling, passant):
 				
 
 	# king
-	# TODO: check for checks
 	if piece.lower() == "k":
 		for move in movements["k"]:
 			if not (0 <= position[0] + move[0] <= 7 and 0 <= position[1] + move[1] <= 7):
