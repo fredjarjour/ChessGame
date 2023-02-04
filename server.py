@@ -92,16 +92,16 @@ def submitmove():
     legal_moves = getAllLegalMoves(fen)
 
     if new_move not in legal_moves:
-        return "illegal move", 409
+        return "Illegal move", 409
     
     new_fen = updateFen(fen, new_move, promote)
     if not new_fen:
-        return "error when updating fen", 422
+        return "Error when updating fen", 422
 
     fen = new_fen
     print(viewBoard(fen))
 
-    return f"move submitted by user {session['username']}", 200
+    return f"Move submitted by user {session['username']}", 200
 
 white_time = datetime.now() + timedelta(minutes=20)
 black_time = datetime.now() + timedelta(minutes=20)
