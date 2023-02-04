@@ -1,6 +1,7 @@
 from flask import Flask, url_for, request
 from gui import viewBoard
 from moves import getAllLegalMoves
+from fen import updateFen
 from string import ascii_letters
 from datetime import datetime, timedelta
 
@@ -22,6 +23,8 @@ def convert_to_tuple_coordinate(coord:str) -> tuple[int, int]:
     # the grid is a list of lists so it sees the board flipped
     return y, x
 
+def
+
 @app.route('/gettimeleft', methods=['POST'])
 def gettimeleft():
     """return the amount of seconds left for the player"""
@@ -36,9 +39,12 @@ def gettimeleft():
 
 @app.route('/submitmove', methods=['POST'])
 def submitmove():
+    global fen
     # in the form a1 or b2 or h7 ...
     form_coord = request.form['from']
     to_coord = request.form['to']
+    # which piece to promote to if the pawn reaches the end
+    promote = request.form.get('promote', None)
 
     print(list(request.form.values()))
 
@@ -46,19 +52,25 @@ def submitmove():
     to_tuple = convert_to_tuple_coordinate(to_coord)
 
     new_move = (from_tuple, to_tuple)
+    print(fen)
     legal_moves = getAllLegalMoves(fen)
 
     if new_move not in legal_moves:
         return "illegal move", 409
     
-    print(f'Moving from {form_coord} to {to_coord}')
-    return "move submitted"
+    new_fen = updateFen(fen, new_move, promote)
+    if not new_fen:
+        return "error when updating fen"
 
+    fen = new_fen
+    print(viewBoard(fen))
+
+    return "move submitted"
 
 p1_time = datetime.now() + timedelta(minutes=20)
 p2_time = datetime.now() + timedelta(minutes=20)
 
 fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-viewBoard(fen)
+print(viewBoard(fen))
 
 app.run(debug=True)
