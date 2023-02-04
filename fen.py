@@ -130,3 +130,105 @@ def gridToFen(grid):
 		fen += "/"
 
 	return fen[:-1]
+
+#This could be optimized when checking if letter == Capitalized letter or not capitalized letter
+def fensToPgn(fens, Coordmoves):
+
+    moveList = []
+    remeberCoords = ""
+
+    for i in range(len(fens)):
+
+        current = fens[i]
+        Coordmove = Coordmoves[i][0]
+        Coordmove2 = Coordmoves[i][1]
+
+        grid = fenToGrid(current.split()[0])
+        letter = grid[int(Coordmove[0])][int(Coordmove[1])]
+
+        if remeberCoords != "":
+            lastMove = moveList.pop()
+            promoted = grid[int(remeberCoords[0])][int(remeberCoords[1])]
+            if promoted == "Q" or promoted == "q":
+                lastMove += "Q"
+            elif promoted == "R" or promoted == "r":
+                lastMove += "R"
+            elif promoted == "B" or promoted == "b":
+                lastMove += "B"
+            elif promoted == "N" or promoted == "n":
+                lastMove += "N"
+            moveList.append(lastMove)
+            remeberCoords = ""
+        
+        currentP = ""
+
+        if letter == "K" or letter == "k":
+            currentP = "K"
+        elif letter == "Q" or letter == "q":
+            currentP = "Q"
+        elif letter == "R" or letter == "r":
+            currentP = "R"
+        elif letter == "B" or letter == "b":
+            currentP = "B"
+        elif letter == "N" or letter == "n":
+            currentP = "N"
+        elif letter == "P" or letter == "p":
+            currentP = "P"
+
+        moveToAppend = ""
+
+        if currentP == "P":
+
+            if abs(int(Coordmove[0]) - int(Coordmove2[0])) == 2:
+                moveToAppend = chr(Coordmove[1]+97) + str(8-Coordmove2[0])
+
+            elif Coordmove[1] == Coordmove2[1]:
+                moveToAppend = chr(Coordmove[1]+97) + str(8-Coordmove2[0])
+
+            else:
+                moveToAppend = chr(Coordmove[1]+97) + "x" + chr(Coordmove2[1]+97) + str(8-Coordmove2[0])
+            if Coordmove2[0] == 0 or Coordmove2[0] == 7:
+                    promoted = grid[int(Coordmove2[0])][int(Coordmove2[1])]
+                    remeberCoords = Coordmove2
+                    moveToAppend += "="
+        elif currentP == "B":
+            moveToAppend = "B"+chr(Coordmove[1]+97) + str(8-Coordmove[0])
+            if grid[Coordmove2[0]][Coordmove2[1]] != " ":
+                moveToAppend += "x"
+            moveToAppend +=chr(Coordmove2[1]+97) + str(8-Coordmove2[0])
+        elif currentP == "N":
+            moveToAppend = "N"+chr(Coordmove[1]+97) + str(8-Coordmove[0])
+            if grid[Coordmove2[0]][Coordmove2[1]] != " ":
+                moveToAppend += "x"
+            moveToAppend +=chr(Coordmove2[1]+97) + str(8-Coordmove2[0])
+        elif currentP == "R":
+            moveToAppend = "R"+chr(Coordmove[1]+97) + str(8-Coordmove[0])
+            if grid[Coordmove2[0]][Coordmove2[1]] != " ":
+                moveToAppend += "x"
+            moveToAppend +=chr(Coordmove2[1]+97) + str(8-Coordmove2[0])
+        elif currentP == "Q":
+            moveToAppend = "Q"+chr(Coordmove[1]+97) + str(8-Coordmove[0])
+            if grid[Coordmove2[0]][Coordmove2[1]] != " ":
+                moveToAppend += "x"
+            moveToAppend +=chr(Coordmove2[1]+97) + str(8-Coordmove2[0])
+        elif currentP == "K":
+            if int(Coordmove[1]) - int(Coordmove2[1]) == 2:
+                moveToAppend = "O-O-O"
+            elif int(Coordmove[1]) - int(Coordmove2[1]) == -2:
+                moveToAppend = "O-O"
+            else :
+                moveToAppend = "K"+chr(Coordmove[1]+97) + str(8-Coordmove[0])
+                if grid[Coordmove2[0]][Coordmove2[1]] != " ":
+                    moveToAppend += "x"
+                moveToAppend +=chr(Coordmove2[1]+97) + str(8-Coordmove2[0])
+
+        moveList.append(moveToAppend)
+
+    pgn = ""
+    for i in range(len(moveList)):
+        if i % 2 == 0:
+            pgn += str(i//2+1) + ". " + moveList[i] + " "
+        else:
+            pgn += moveList[i] + " "
+
+    return pgn
