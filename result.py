@@ -26,6 +26,8 @@ def gameOver(fen):
 
 def threefoldRepetition(fen):
     position = fen.split()[0]
+    if fen.split()[-2] == "0":
+        threefold.positions = {}
     if threefold.positions.get(position, 0) >= 3:
         return True
     threefold.positions[position] = threefold.positions.get(position, 0) + 1
