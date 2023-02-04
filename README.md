@@ -1,16 +1,28 @@
 # API for the server
 
-1) POST /gettimeleft
-   1) post data:
-      1) player = [0 | 1]
-   2) returns:
-      1) the number of seconds on the clock for the given player -- 200 OK
-2) POST /submitmove
-   1) post data:
-      1) from = [a-h][1-8]
-      2) to = [a-h][1-8]
-   2) returns:
-      1) "move submitted" if everything went right -- 200 OK
-      2) "illegal move" if move is not legal -- 409 Conflict
-      3) "error when updating fen" if other error like the pawn promotion was not specified -- 422 Unprocessable Entity
-      4) "No time left on clock" if player lost on time -- 408 Request Timeout
+* POST /gettimeleft
+  * post data:
+    * player = [w | b]
+  * returns:
+    * the number of seconds on the clock for the given player -- 200 OK
+* POST /submitmove
+  * post data:
+    * from = [a-h][1-8]
+    * to = [a-h][1-8]
+  * returns:
+    * "move submitted" if everything went right -- 200 OK
+    * "illegal move" if move is not legal -- 409 Conflict
+    * "error when updating fen" if other error like the pawn promotion was not specified -- 422 Unprocessable Entity
+    * "No time left on clock" if player lost on time -- 408 Request Timeout
+    * "Not your turn" -- 425 Too Early
+* POST /login
+  * post data:
+    * user = [A-Za-z0-9]*
+  * returns
+    * "User {user} logged in successfully" -- 200
+    * "Game is already full" -- 423 Locked
+
+
+## Examples
+
+see `test.py` for a python3 example of the api
