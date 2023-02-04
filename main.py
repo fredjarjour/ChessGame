@@ -1,7 +1,24 @@
-from gui import viewBoard
 from moves import getAllLegalMoves
-from fen import updateFen, fenToGrid, gridToFen
+from fen import updateFen
+from result import gameOver
+import threefold
+import random
 
-print(getAllLegalMoves("rnbqkb1r/pppppppp/8/8/6n1/3q4/6K1/8 w kq - 4 3"))
 
+results = {}
+numGames = 10
 
+for _ in range(numGames):
+    fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+    while True:
+        legalMoves = getAllLegalMoves(fen)
+        move = random.choice(legalMoves)
+        fen = updateFen(fen, move)
+        game = gameOver(fen) 
+        if game[0]:
+            results[game[2]] = results.get(game[2], 0) + 1
+            break
+    threefold.positions = {}
+
+print(f"After running {numGames} games, the results are:")
+print(results)
