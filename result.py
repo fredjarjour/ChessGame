@@ -9,15 +9,17 @@ except ImportError:
 import math
 
 # return a tuple: (isGameOver: bool, result: string explaining)
-def gameOver(fen):
+def gameOver(fen, legalMoves=None):
     if int(fen.split()[-2]) >= 100:
         return [True, 0, "50-move rule"]
     
     if threefoldRepetition(fen):
         return [True, 0, "Threefold repetition"]
 
+    if legalMoves == None:
+        legalMoves = getAllLegalMoves(fen)
     # checkmate or stalemate
-    if getAllLegalMoves(fen) == []:
+    if legalMoves == []:
         if isCheck(fenToGrid(fen.split()[0]), fen.split()[1]):
             return [True, math.inf * (-1 if fen.split()[1] == "w" else 1), "Checkmate"]
         return [True, 0, "Stalemate"]
@@ -26,8 +28,6 @@ def gameOver(fen):
 
 def threefoldRepetition(fen):
     position = fen.split()[0]
-    if fen.split()[-2] == "0":
-        threefold.positions = {}
     if threefold.positions.get(position, 0) >= 3:
         return True
     threefold.positions[position] = threefold.positions.get(position, 0) + 1

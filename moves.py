@@ -30,8 +30,6 @@ def getAllLegalMoves(fen):
 	
 	return legalMoves
 
-
-
 def getLegalMoves(grid, position, castling, passant):
 	legalMoves = []
 	piece = grid[position[0]][position[1]]
@@ -123,18 +121,14 @@ def checkForCheck(grid, move, color):
 		if isCheck(newGrid, color):
 			return True
 			
-			
-
 	newGrid = updateGrid([row[:] for row in grid], move)
-	
-
 
 	return isCheck(newGrid, color)
-	
 	
 def isCheck(grid, color):
 	king = None
 	# find king
+	if color == "w": grid = grid[::-1]
 	for row in range(8):
 		for char in range(8):
 			if grid[row][char] == ("K" if color == "w" else "k"):
@@ -142,6 +136,9 @@ def isCheck(grid, color):
 				break
 		if king != None:
 			break
+	if color == "w":
+		grid = grid[::-1]
+		king = (7 - king[0], king[1])
 
 	# queen and rook
 	for moveList in movements["q"]:
@@ -161,7 +158,7 @@ def isCheck(grid, color):
 					return True
 				break
 			break
-	
+
 	# knight
 	for move in movements["n"]:
 		if not (0 <= king[0] + move[0] <= 7 and 0 <= king[1] + move[1] <= 7):
@@ -184,7 +181,5 @@ def isCheck(grid, color):
 		return True
 	if 0 <= king[1] + 1 <= 7 and grid[king[0] + direction][king[1] + 1] == ("p" if color == "w" else "P"):
 		return True
-
-	return False
-
 	
+	return False
