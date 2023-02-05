@@ -1,4 +1,13 @@
-# API for the server
+# Chess Game
+
+Chess Game is an implementation of the full game of chess. It also has multiple other features such as displaying a command-line version the board, finding all the legal moves in a position, parsing [FEN](https://www.chess.com/terms/fen-chess) positions, etc.
+
+Its main use is as a tool to be used for games between chess bots created by the players, either using the Chess Game functions or not. It does so by using a server, which receives moves from a player and communicates it to the other. The full API for the server is found below in the README.
+
+To use ChessGame as a basis for a bot, simply clone the repository inside of the folder containing your bot script, then `import ChessGame.[file]` or `from ChessGame.[file] import [function]`.
+
+
+## API for the server
 
 * POST /gettimeleft
   * post data:
@@ -23,6 +32,6 @@
     * "Game is already full" -- 423 Locked
 
 
-## Examples
+### Examples
 
-see `test.py` for a python3 example of the api
+See `test.py` for a python3 example of the api
