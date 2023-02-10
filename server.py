@@ -4,14 +4,14 @@ from moves import getAllLegalMoves
 from fen import updateFen
 from string import ascii_letters
 from datetime import datetime, timedelta
-import markdown
+import time
 
 app = Flask(__name__)
 
 app.secret_key = 'mysecretkey'.encode()
 
 def convert_to_tuple_coordinate(coord:str) -> tuple[int, int]:
-    """a1 becomes (0, 0) and b2 becomes (1, 1) ..."""
+    """a1 becomes (0, 0), and b2 becomes (1, 1) ..."""
 
     assert len(coord) == 2
     coord = coord.lower()
@@ -25,6 +25,15 @@ def convert_to_tuple_coordinate(coord:str) -> tuple[int, int]:
 
     # the grid is a list of lists so it sees the board flipped
     return y, x
+
+def convert_to_chess_coordinate(coord: tuple[int, int]) -> str:
+    """(0, 0) become a1, and (1, 1) becomes b2 ..."""
+    # the grid is a list of lists so it sees the board flipped
+    y, x = coord
+    file = ascii_letters[x]
+    rank = str(8 - y)
+
+    return file + rank
 
 def is_player_turn(username):
     turn = fen.split()[1] # gets 'w' if white's turn or 'b' if black's turn
@@ -66,7 +75,7 @@ def gettimeleft():
 
 @app.route('/submitmove', methods=['POST'])
 def submitmove():
-    global fen
+    global fen, last_move
     if 'username' not in session:
         return "You are not logged in", 401
 
@@ -79,16 +88,15 @@ def submitmove():
         return "No time left on clock", 408
 
     # in the form a1 or b2 or h7 ...
-    form_coord = request.form['from']
+    from_coord = request.form['from']
     to_coord = request.form['to']
     # which piece to promote to if the pawn reaches the end
     promote = request.form.get('promote', None)
 
-    from_tuple = convert_to_tuple_coordinate(form_coord)
+    from_tuple = convert_to_tuple_coordinate(from_coord)
     to_tuple = convert_to_tuple_coordinate(to_coord)
 
     new_move = (from_tuple, to_tuple)
-    print(fen)
     legal_moves = getAllLegalMoves(fen)
 
     if new_move not in legal_moves:
@@ -99,10 +107,31 @@ def submitmove():
         return "Error when updating fen", 422
 
     fen = new_fen
+    print(fen)
     print(viewBoard(fen))
+
+    # last move is a string that looks like "a1b2"
+    last_move = from_coord + to_coord
 
     return f"Move submitted by user {session['username']}", 200
 
+@app.route('/getmove', methods=['GET'])
+def getmove():
+    if 'username' not in session:
+        return "You are not logged in", 401
+
+    username = session['username']
+
+    # the player whose turn it ISNT, waits until it is their turn to read the last move
+    while not is_player_turn(username) or last_move is None:
+        time.sleep(0.2)
+
+    # the player who currently needs to play
+    # requires the other player's last move
+    return last_move
+
+
+last_move = None # used to hold the last move so it can be given to the other player
 white_time = datetime.now() + timedelta(minutes=20)
 black_time = datetime.now() + timedelta(minutes=20)
 white_username = None
