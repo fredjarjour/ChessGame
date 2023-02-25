@@ -47,6 +47,7 @@ def is_player_turn(username):
 def login():
     global white_username, black_username
     user = request.form['user']
+    print("User", user, "logged in")
     session['username'] = user
 
     # make sure there is not already 2 players
@@ -61,17 +62,23 @@ def login():
     return f"User {user} logged in successfully", 200
 
 
-@app.route('/gettimeleft', methods=['POST'])
+@app.route('/gettimeleft', methods=['GET'])
 def gettimeleft():
     """return the amount of seconds left for the player"""
-    player = request.form['player'].lower()
+    print(dict(request.args))
+    player = request.args.get('player')
+
+    print("Getting time left for player", player)
+
+    w_time_left = str((white_time - datetime.now()).seconds)
+    b_time_left = str((black_time - datetime.now()).seconds)
 
     if player == 'w':
-        return str((white_time - datetime.now()).seconds)
+        return w_time_left
     if player == 'b':
-        return str((white_time - datetime.now()).seconds)
+        return b_time_left
 
-    return -1
+    return "Invalid player", 400
 
 @app.route('/submitmove', methods=['POST'])
 def submitmove():
