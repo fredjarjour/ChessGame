@@ -65,7 +65,6 @@ def login():
 @app.route('/gettimeleft', methods=['GET'])
 def gettimeleft():
     """return the amount of seconds left for the player"""
-    print(dict(request.args))
     player = request.args.get('player')
 
     print("Getting time left for player", player)
@@ -100,11 +99,14 @@ def submitmove():
     # which piece to promote to if the pawn reaches the end
     promote = request.form.get('promote', None)
 
+    print(f'from {from_coord} to {to_coord} {"promote to " + promote if promote is not None else ""}')
+
     from_tuple = convert_to_tuple_coordinate(from_coord)
     to_tuple = convert_to_tuple_coordinate(to_coord)
 
-    new_move = (from_tuple, to_tuple)
     legal_moves = getAllLegalMoves(fen)
+
+    new_move = (from_tuple, to_tuple)
 
     if new_move not in legal_moves:
         return "Illegal move", 409
@@ -113,13 +115,16 @@ def submitmove():
     if not new_fen:
         return "Error when updating fen", 422
 
-    fen = new_fen
-    print(fen)
-    print(viewBoard(fen))
+    print(new_fen)
+    print(viewBoard(new_fen))
 
-    # last move is a string that looks like "a1b2"
-    last_move = from_coord + to_coord
+    # last move is a string that looks like "a1b2" or "a1b2q" with the promotion piece
+    last_move = from_coord + to_coord + (promote or '')
 
+    # lock in this move by updating the fen at the end of the function
+    # this avoids race conditions where the other player thinks it is their turn
+    fen = new_fen 
+    
     return f"Move submitted by user {session['username']}", 200
 
 @app.route('/getmove', methods=['GET'])
@@ -138,7 +143,7 @@ def getmove():
     return last_move
 
 
-last_move = None # used to hold the last move so it can be given to the other player
+last_move = None, None # used to hold the last move so it can be given to the other player
 white_time = datetime.now() + timedelta(minutes=20)
 black_time = datetime.now() + timedelta(minutes=20)
 white_username = None

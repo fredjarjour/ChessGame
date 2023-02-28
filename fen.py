@@ -1,4 +1,4 @@
-def updateFen(previousFen, move, promote = "q"):
+def updateFen(previousFen, move, promote="q"):
 	position, color, castling, passant, halfmove, fullmove = previousFen.split()
 	grid = fenToGrid(position)
 
