@@ -1,7 +1,7 @@
 try:
 	from fen import fenToGrid
 except ImportError:
-	from Chess.fen import fenToGrid
+	from ChessGame.fen import fenToGrid
 
 def viewBoard(position):
 	grid = fenToGrid(position)

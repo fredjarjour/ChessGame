@@ -3,9 +3,9 @@ try:
     from fen import fenToGrid
     import threefold
 except ImportError:
-    from Chess.moves import isCheck, getAllLegalMoves
-    from Chess.fen import fenToGrid
-    import Chess.threefold as threefold
+    from ChessGame.moves import isCheck, getAllLegalMoves
+    from ChessGame.fen import fenToGrid
+    import ChessGame.threefold as threefold
 import math
 
 # return a tuple: (isGameOver: bool, result: string explaining)

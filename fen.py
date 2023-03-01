@@ -91,7 +91,7 @@ def updateGrid(grid, move, passant="-", promote="q"):
 	
 	# castling
 	if piece.lower() == "k" and abs(move[0][1] - move[1][1]) == 2:
-		if move[1][1] == 7:
+		if move[1][1] == 6:
 			grid[move[1][0]][5] = grid[move[1][0]][7]
 			grid[move[1][0]][7] = " "
 		else:

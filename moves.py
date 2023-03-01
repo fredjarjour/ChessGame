@@ -2,8 +2,8 @@ try:
 	from fen import fenToGrid, updateGrid
 	from pieces import movements
 except ImportError:
-	from Chess.fen import fenToGrid, updateGrid
-	from Chess.pieces import movements
+	from ChessGame.fen import fenToGrid, updateGrid
+	from ChessGame.pieces import movements
 
 def getAllLegalMoves(fen):
 	pseudoLegalMoves = []
@@ -51,7 +51,6 @@ def getLegalMoves(grid, position, castling, passant):
 			legalMoves.append((position, (position[0] + direction, position[1] + 1)))
 		# en passant
 		if len(passant) > 1:
-			print(passant, position)
 			letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
 			numbers = ["8", "7", "6", "5", "4", "3", "2", "1"]
 			if position[1] > 0 and numbers[position[0] + direction] == passant[1] and position[1] - 1 == letters.index(passant[0]):
