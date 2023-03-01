@@ -41,22 +41,15 @@ def updateFen(previousFen, move, promote="q"):
 
 	# en passant
 	rowNumber = 3 if color == "b" else 4
-	direction = 1 if color == "b" else -1
 	foundPassant = False
-	for char in range(1, 7):
-		if newGrid[rowNumber][char] == ("P" if color == "b" else "p") and newGrid[rowNumber - direction][char] == newGrid[rowNumber - direction * 2][char] == " ":
-			if newGrid[rowNumber][char - 1] == ("p" if color == "b" else "P") or newGrid[rowNumber][char + 1] == ("p" if color == "b" else "P"):
-				temprow = position.split("/")[rowNumber - 2 * direction]
-				row = ""
-				for c in temprow:
-					if c.isdigit():
-						row += " " * int(c)
-					else:
-						row += c
-				if row[char].lower() == "p":
-					newFen += " " + letters[char] + str(rowNumber - direction) + " "
-					foundPassant = True
-					break
+	if grid[move[0][0]][move[0][1]].lower() == "p" and abs(move[0][0] - move[1][0]) == 2:
+		# check if there is a pawn that can capture the passant
+		for i in [-1, 1]:
+			if grid[move[1][0]][move[1][1] + i].lower() == "p" and grid[move[1][0]][move[1][1] + i] != grid[move[0][0]][move[0][1]]:
+				newFen += letters[move[1][1] + i] + str(rowNumber)
+				foundPassant = True
+				break
+	
 	if not foundPassant:
 		newFen += " - "
 
