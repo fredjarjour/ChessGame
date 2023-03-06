@@ -153,4 +153,4 @@ fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 if __name__ == "__main__":
     print(viewBoard(fen))
-    app.run(debug=False)
+    app.run(debug=False, host='0.0.0.0')

@@ -40,13 +40,15 @@ def updateFen(previousFen, move, promote="q"):
 	newFen += castling if len(castling) > 0 else "-"
 
 	# en passant
-	rowNumber = 3 if color == "b" else 4
+	rowNumber = 6 if color == "b" else 3
 	foundPassant = False
-	if grid[move[0][0]][move[0][1]].lower() == "p" and abs(move[0][0] - move[1][0]) == 2:
+	if grid[move[1][0]][move[1][1]].lower() == "p" and abs(move[0][0] - move[1][0]) == 2:
 		# check if there is a pawn that can capture the passant
 		for i in [-1, 1]:
+			if move[1][1] + i < 0 or move[1][1] + i > 7:
+				continue
 			if grid[move[1][0]][move[1][1] + i].lower() == "p" and grid[move[1][0]][move[1][1] + i] != grid[move[0][0]][move[0][1]]:
-				newFen += letters[move[1][1] + i] + str(rowNumber)
+				newFen += " " + letters[move[1][1]] + str(rowNumber) + " "
 				foundPassant = True
 				break
 	
