@@ -1,7 +1,7 @@
 from flask import Flask, request, session
 from gui import viewBoard
 from moves import getAllLegalMoves
-from fen import updateFen
+from fen import updateFen, fensToPgn
 from string import ascii_letters
 from datetime import datetime, timedelta
 import time
@@ -56,10 +56,12 @@ def login():
 
     if not white_username:
         white_username = user
+        return_color = 'white'
     else:
         black_username = user
+        return_color = 'black'
 
-    return f"User {user} logged in successfully", 200
+    return return_color
 
 
 @app.route('/gettimeleft', methods=['GET'])
@@ -123,7 +125,10 @@ def submitmove():
 
     # lock in this move by updating the fen at the end of the function
     # this avoids race conditions where the other player thinks it is their turn
-    fen = new_fen 
+
+    history_of_fens.append(new_fen)
+    history_of_moves.append(new_move)
+    fen = new_fen
     
     return f"Move submitted by user {session['username']}", 200
 
@@ -150,7 +155,12 @@ white_username = None
 black_username = None
 
 fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+history_of_fens = [fen]
+history_of_moves = []
 
 if __name__ == "__main__":
     print(viewBoard(fen))
-    app.run(debug=False)
+    app.run(debug=False, host='0.0.0.0')
+
+    print("Shutting down server")
+    print(fensToPgn(history_of_fens[:-1], history_of_moves))
