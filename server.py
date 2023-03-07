@@ -137,13 +137,13 @@ def getmove():
     # the player whose turn it ISNT, waits until it is their turn to read the last move
     while not is_player_turn(username) or last_move is None:
         time.sleep(0.2)
-
+    
     # the player who currently needs to play
     # requires the other player's last move
     return last_move
 
 
-last_move = None, None # used to hold the last move so it can be given to the other player
+last_move = None # used to hold the last move so it can be given to the other player
 white_time = datetime.now() + timedelta(minutes=20)
 black_time = datetime.now() + timedelta(minutes=20)
 white_username = None
@@ -153,4 +153,4 @@ fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 if __name__ == "__main__":
     print(viewBoard(fen))
-    app.run(debug=False, host='0.0.0.0')
+    app.run(debug=False)
