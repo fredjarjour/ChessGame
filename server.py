@@ -5,7 +5,6 @@ from fen import updateFen, fensToPgn
 from string import ascii_letters
 from datetime import datetime, timedelta
 import time
-from stockfish import Stockfish
 
 app = Flask(__name__)
 
@@ -170,8 +169,6 @@ black_username = None
 halfmoves = 1
 fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-sf = Stockfish()
-sf.set_fen_position(fen)
 history_of_fens = [fen]
 history_of_moves = []
 

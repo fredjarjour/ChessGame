@@ -11,6 +11,11 @@ while not (val_type == 'mate' and val == 0):
     fen = r.text
 
     print()
+    if fen.split(" ")[1] == "w":
+        print("White's turn")
+    else:
+        print("Black's turn")
+        
     print("-------------------------")
     sf.set_fen_position(fen)
     best_move = sf.get_best_move()
