@@ -5,6 +5,7 @@ from fen import updateFen, fensToPgn
 from string import ascii_letters
 from datetime import datetime, timedelta
 import time
+from stockfish import Stockfish
 
 app = Flask(__name__)
 
@@ -83,7 +84,7 @@ def gettimeleft():
 
 @app.route('/submitmove', methods=['POST'])
 def submitmove():
-    global fen, last_move
+    global fen, last_move, halfmoves
     if 'username' not in session:
         return "You are not logged in", 401
 
@@ -101,7 +102,7 @@ def submitmove():
     # which piece to promote to if the pawn reaches the end
     promote = request.form.get('promote', None)
 
-    print(f'from {from_coord} to {to_coord} {"promote to " + promote if promote is not None else ""}')
+    print(f'{from_coord}{to_coord}{"=" + promote if promote is not None else ""}')
 
     from_tuple = convert_to_tuple_coordinate(from_coord)
     to_tuple = convert_to_tuple_coordinate(to_coord)
@@ -118,7 +119,6 @@ def submitmove():
         return "Error when updating fen", 422
 
     print(new_fen)
-    print(viewBoard(new_fen))
 
     # last move is a string that looks like "a1b2" or "a1b2q" with the promotion piece
     last_move = from_coord + to_coord + (promote or '')
@@ -128,8 +128,9 @@ def submitmove():
 
     history_of_fens.append(new_fen)
     history_of_moves.append(new_move)
+
+    halfmoves += 1
     fen = new_fen
-    
     return f"Move submitted by user {session['username']}", 200
 
 @app.route('/getmove', methods=['GET'])
@@ -148,18 +149,33 @@ def getmove():
     return last_move
 
 
+@app.route('/getfen', methods=['GET'])
+def getfen():
+    hm = request.args.get('halfmove', None)
+
+    if hm is None:
+        return fen
+
+    while halfmoves != int(hm):
+        time.sleep(0.2)
+
+    return fen
+
 last_move = None # used to hold the last move so it can be given to the other player
 white_time = datetime.now() + timedelta(minutes=20)
 black_time = datetime.now() + timedelta(minutes=20)
 white_username = None
 black_username = None
 
+halfmoves = 1
 fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
+sf = Stockfish()
+sf.set_fen_position(fen)
 history_of_fens = [fen]
 history_of_moves = []
 
 if __name__ == "__main__":
-    print(viewBoard(fen))
     app.run(debug=False, host='0.0.0.0')
 
     print("Shutting down server")
